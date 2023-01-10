@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const http = require('http').createServer(app);
 const { Server } = require('socket.io');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 const io = new Server(http);
 require('./util/socketHandler')(io);
