@@ -38,11 +38,11 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(__dirname + '/public/static'));
 };
 
-const https = require('https').createServer(app);
+const http = require('http').createServer(app);
 const { Server } = require('socket.io');
 const PORT = process.env.PORT || 8080;
 
-const io = new Server(https);
+const io = new Server(http);
 require('./util/socketHandler')(io);
 
 const session = require('express-session');
