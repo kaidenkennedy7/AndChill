@@ -5,7 +5,7 @@ $(() => {
 $('form').on('submit', async(event) => {
     event.preventDefault();
     $('.failed-attempt').removeClass('show');
-    $('.failed-attempt').text('&nbsp;');
+    $('.failed-attempt').text('Incorrect Username Or Password');
     $('.spinner').addClass('enabled');
 
     const array = $('form').serializeArray();
