@@ -121,11 +121,11 @@ nav {
 }
 
 .nav-item.user {
-    color:rgb(255, 224, 198);
+    color: #ffffff;
 }
 
 .nav-item.likes {
-    color:rgb(175, 225, 175);
+    color: #ffffff;
     font-size: 1rem;
 }
 
