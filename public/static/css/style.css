@@ -183,11 +183,6 @@ footer > .footer-content > .column > a {
 
 }
 
-footer > .footer-content > .column > #link {
-    color: var(--color-font-default);
-    text-decoration: none;
-}
-
 footer > .footer-content > .column > a > #moviedb {
     height: 1rem;
 }
