@@ -62,6 +62,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 140vh;
+    text-decoration: none;
 }
 
 input, select, textarea, button{
@@ -169,6 +170,8 @@ footer > .footer-content > .column {
 
 footer > .footer-content > .column > p {
     margin: 0;
+    color: var(--color-font-default);
+    text-decoration: none;
 }
 
 footer > .footer-content > .column > a {
@@ -178,6 +181,11 @@ footer > .footer-content > .column > a {
     color: var(--color-font-default);
     column-gap: 0.5rem;
 
+}
+
+footer > .footer-content > .column > #link {
+    color: var(--color-font-default);
+    text-decoration: none;
 }
 
 footer > .footer-content > .column > a > #moviedb {
