@@ -87,17 +87,23 @@ const initHammer = (elem, item) => {
         const keep = Math.abs(ev.velocityX) < 1.1;
         if (!keep) {
             hammertime.set({enable: false});
-            const endX = Math.max(Math.abs(ev.velocityX) * moveOutWidth, moveOutWidth);
-            const toX = ev.deltaX > 0 ? endX : -endX;
+            let toX;
+            let endX = Math.max(Math.abs(ev.velocityX) * moveOutWidth, moveOutWidth);
+            if (ev.deltaX > 0) {
+                toX = endX;
+                WebSocket.clientLikedItem(item);
+            } else {
+                toX = -endX;
+            }
             const endY = Math.abs(ev.velocityY) * moveOutWidth;
             const toY = ev.deltaY > 0 ? endY : -endY;
             elem.style.transition = 'all 1s ease';
             elem.style.transform = `translate3d(${toX}px, ${toY + ev.deltaY}px, 100px)`;
-            if (!elem.classList.contains('first')) {
-                    if (toX > 0) {
-                        WebSocket.clientLikedItem(item);
-                    }
-            }
+            // if (!elem.classList.contains('first')) {
+            //         if (toX > 0) {
+            //             WebSocket.clientLikedItem(item);
+            //         }
+            // }
             
             CardManager.addCard();
             setTimeout(() => {
