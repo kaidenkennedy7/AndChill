@@ -6,7 +6,8 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}));
 
 const cors = require('cors');
-app.use(cors({ origin: 'https://and-chill.herokuapp.com/'}));
+app.use(cors({ origin: 'https://and-chill.herokuapp.com/',
+                credentials: 'include'}));
 
 const compression = require('compression');
 app.use(compression());
@@ -50,10 +51,10 @@ app.use(session({
     name: 'sid',
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { 
-        sameSite: 'strict',
-        secure: false
+        sameSite: 'none',
+        secure: true
     }
 }));
 

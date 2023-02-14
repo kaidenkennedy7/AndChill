@@ -74,24 +74,22 @@ router.post('/auth/register', checkSchema(register), async (req, res, next) => {
 
 router.post('/auth/login', async (req, res) => {
     try {
-        const foundByUsername = await Credentials.findOne({username: req.body.user}); //search database for a
-        const foundByEmail = await Credentials.findOne({email: req.body.user});
+        const foundByUsername = await Credentials.findOne({ username: req.body.user}); //search database for a 
+        const foundByEmail = await Credentials.findOne({ email: req.body.user});
         const foundUser = (foundByUsername) ? foundByUsername : foundByEmail; //ternary operation to find user by email if not found by username;
-        if (foundUser) {
+        if (foundUser) { 
             const compared = await bcrypt.compare(req.body.password, foundUser.password);
             if (compared) {
-                const token = jwt.sign({id: foundUser._id}, process.env.JWT_SECRET, {
-                    expiresIn: process.env.JWT_EXPIRES_IN,
-                });
-                return res.status(200).json({
-                    message: 'Authenticated',
-                    token,
-                });
+                req.session.loggedIn = true;
+                req.session.userId = req.body.user;
+                res.status(200);
+                return res.send({msg: 'Authenticated'});
             }
         }
-        return res.status(401).json({message: 'Invalid password or username'});
+        res.status(401);
+        return res.send({msg: 'Invalid password or username'});
     } catch (error) {
-        res.status(500).json({message: `Internal server error`});
+        res.status(500).send(`Internal server error`);
     }
 });
 
