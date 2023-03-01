@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./db/db-connection');
 
 const express = require('express');
 const app = express();
@@ -6,13 +7,10 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}));
 
 const cors = require('cors');
-app.use(cors({ origin: 'https://and-chill.herokuapp.com/',
-                credentials: 'include'}));
+app.use(cors({ origin: 'https://and-chill.herokuapp.com/'}));
 
 const compression = require('compression');
 app.use(compression());
-
-const db = require('./db/db-connection');
 
 // use custom rate-limit
 const rateLimit = require('./util/rate-limit');
@@ -51,10 +49,10 @@ app.use(session({
     name: 'sid',
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { 
-        sameSite: 'none',
-        secure: true
+        sameSite: 'strict',
+        secure: false
     }
 }));
 

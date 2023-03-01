@@ -3,7 +3,7 @@ const Filtering = (() => {
         page: 1,
         media: ['movie', 'tv'],
         watch_monetization_types: [],
-        watch_region: 'DK',
+        watch_region: 'US',
         sort_by: 'vote_count.desc',
     };
 

@@ -9,7 +9,6 @@ const ItemFetch = (() => {
         const { countryCode } = await fetchIpData();
         const response = await fetch(`/items/inital/${countryCode}`);
         const result = await response.json();
-        console.log(result)
         return [...result];
     };
 

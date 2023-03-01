@@ -1,10 +1,10 @@
 const router = require('express').Router();
-
+const Users = require('../db/model/credentials.js');
 const Preferences = require('../db/model/preferences.js');
-
+const authenticateToken = require('../middleware/auth.js');
 const pages = require('../util/ssr');
 
-router.get('/user/:id/preferences', (req, res, next) => {
+router.get('/user/:id/preferences', authenticateToken, (req, res, next) => {
     if (req.session.userId) {
         res.send(pages.preferences);
     } else {
@@ -12,7 +12,7 @@ router.get('/user/:id/preferences', (req, res, next) => {
     }
 });
 
-router.get('/likes', async(req, res) => {
+router.get('/likes', authenticateToken, async(req, res) => {
     const user = req.session.userId;
     try {
         if(user){
@@ -26,7 +26,7 @@ router.get('/likes', async(req, res) => {
     }
 });
 
-router.post('/likes', async(req, res) => {
+router.post('/likes', authenticateToken, async(req, res) => {
     const like = req.body.like.id;
     const media_type = req.body.like.media_type;
     const genres = req.body.like.genres;
@@ -48,7 +48,7 @@ router.post('/likes', async(req, res) => {
     }
 });
 
-router.get("/user/*", (req, res) => {
+router.get("/user/*", authenticateToken, (req, res) => {
     res.send(pages.requestlogin);
 });
 

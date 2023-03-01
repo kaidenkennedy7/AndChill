@@ -1,6 +1,8 @@
 const { MovieDb } = require('moviedb-promise');
 const moviedb = new MovieDb(process.env.MOVIEDB_API_KEY);
+
 const fetch = require('node-fetch');
+
 const router = require('express').Router();
 
 const fetchMovies = async (options) => {
@@ -13,6 +15,24 @@ const fetchMovies = async (options) => {
             return movieDetails;
         }));
         //return moviesList;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const getDiscoverMovies = async (options = {}) => {
+    try {
+        const discoverMovieResponse = await moviedb.discoverMovie(options);
+        return discoverMovieResponse;
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const getDiscoverTv = async (options = {}) => {
+    try {
+        const discoverTvResponse = await moviedb.discoverTv(options);
+        return discoverTvResponse;
     } catch (error) {
         console.error(error);
     }
@@ -34,7 +54,7 @@ const fetchTv = async (options) => {
 
 const fetchProviders = async (watch_region) => {
     const base_url = 'https://api.themoviedb.org/3/watch/providers';
-    const query = `?api_key=${process.env.MOVIEDB_API_KEY}&language=en-US&watch_region=US`;
+    const query = `?api_key=${process.env.MOVIEDB_API_KEY}&language=en-US&watch_region=${watch_region}`;
     try {
         const [movieProvidersResponse, tvProvidersResponse] = await Promise.all([fetch(`${base_url}/movie${query}`), fetch(`${base_url}/tv${query}`)]);
         const [ movieProviders, tvProviders ] = await Promise.all([movieProvidersResponse.json(), tvProvidersResponse.json()]);
@@ -93,10 +113,11 @@ const buildFilterOptions = (filter = {}) => {
 };
 
 const mixAndSortItems = async (items, sort_by) => {
+    const sort_key = sort_by.split('.')[0];
     if (sort_by.includes('.desc')) {
-        items.sort((a, b) => b[sort_by] - a[sort_by]);
+        items.sort((a, b) => b[sort_key] - a[sort_key]);
     } else {
-        items.sort((a, b) => a[sort_by] - b[sort_by]);
+        items.sort((a, b) => a[sort_key] - b[sort_key]);
     }
     return items;
 };
@@ -144,6 +165,49 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/discover', async (req, res) => {
+    const { filters } = req.query;
+    const parsedFilters = JSON.parse(filters);
+    if (!parsedFilters.media.movie) {
+        const response = await getDiscoverTv(parsedFilters);
+        res.send(response.results);
+    } else if (!parsedFilters.media.tv) {
+        const response = await getDiscoverMovies(parsedFilters);
+        res.send(response.results);
+    } else {
+        const movies = await getDiscoverMovies(parsedFilters);
+        const tv = await getDiscoverTv(parsedFilters);
+        const data = await mixAndSortItems([...movies.results, ...tv.results], parsedFilters.sort_by);
+        res.send(data);
+    }
+});
+
+router.get('/discover/movies', async (req, res) => {
+    const options = req.query;
+    //const response = await getDiscoverMovies(options);
+    const response = await fetchMovies(options);
+    res.send(response);
+});
+
+router.get('/discover/tv', async (req, res) => {
+    const options = req.query;
+    const response = await fetchTv(options);
+    //const response = await getDiscoverTv(options);
+    res.send(response);
+});
+
+router.get('/tv/:id', async (req, res) => {
+    const { id } = req.params;
+    const response = await moviedb.tvInfo({ id });
+    res.send(response);
+});
+
+router.get('/movie/:id', async (req, res) => {
+    const { id } = req.params;
+    const response = await moviedb.movieInfo({ id });
+    res.send(response);
+});
+
 router.get('/initial/:watch_region', async (req, res, next) => {
     const watch_region = req.params.watch_region;
     try {
@@ -186,13 +250,14 @@ router.get('/:media_type/:id', async (req, res, next) => {
     res.send(item);
 });
 
-router.get('/ipinfo', async (req, res) => {
+router.get('/ipinfo', async (req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const response = await fetch(`https://api.db-ip.com/v2/free/${ip}`);
     const ipinfo = await response.json();
     if (ipinfo.countryCode == 'ZZ') {
         ipinfo.countryCode = 'US';
     }
+    console.log(ipinfo)
     res.send(ipinfo);
 });
 
