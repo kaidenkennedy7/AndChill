@@ -95,3 +95,22 @@ const server = http.listen(PORT, (error) => {
     }
     console.log('Server running on port', server.address().port);    
 });
+
+const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/plugin/landingPage/default');
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
+const { ApolloServer } = require('apollo-server-express');
+const { typeDefs, resolvers } = require('./gqlSchema');
+
+const createGraphQLServer = async () => {
+    const graphqlServer = new ApolloServer({ 
+        typeDefs, 
+        resolvers, 
+        plugins: [
+            ApolloServerPluginLandingPageLocalDefault(),
+            ApolloServerPluginDrainHttpServer({httpServer: http}),
+        ]
+    });
+    await graphqlServer.start();
+    graphqlServer.applyMiddleware({ app, path: '/graphql' });
+}
+createGraphQLServer().then();
