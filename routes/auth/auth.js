@@ -77,27 +77,29 @@ router.post('/auth/login', async (req, res) => {
         const foundByUsername = await Credentials.findOne({ username: req.body.user}); //search database for a 
         const foundByEmail = await Credentials.findOne({ email: req.body.user});
         const foundUser = (foundByUsername) ? foundByUsername : foundByEmail; //ternary operation to find user by email if not found by username;
-        // if (foundUser) { 
-        //     const compared = await bcrypt.compare(req.body.password, foundUser.password);
-        //     if (compared) {
-        //         req.session.loggedIn = true;
-        //         req.session.userId = req.body.user;
-        //         res.status(200);
-        //         return res.send({msg: 'Authenticated'});
-        //     }
-        // }
-        if (foundUser) {
+        if (foundUser) { 
+            console.log(foundUser)
             const compared = await bcrypt.compare(req.body.password, foundUser.password);
             if (compared) {
-                const token = jwt.sign({id: foundUser._id}, process.env.JWT_SECRET, {
-                    expiresIn: process.env.JWT_EXPIRES_IN,
-                });
-                return res.status(200).json({
-                    message: 'Authenticated',
-                    token,
-                });
+                req.session.loggedIn = true;
+                req.session.userId = req.body.user;
+                console.log(req.body.user)
+                res.status(200);
+                return res.send({msg: 'Authenticated'});
             }
         }
+        // if (foundUser) {
+        //     const compared = await bcrypt.compare(req.body.password, foundUser.password);
+        //     if (compared) {
+        //         const token = jwt.sign({id: foundUser._id}, process.env.JWT_SECRET, {
+        //             expiresIn: process.env.JWT_EXPIRES_IN,
+        //         });
+        //         return res.status(200).json({
+        //             message: 'Authenticated',
+        //             token,
+        //         });
+        //     }
+        // }
         res.status(401);
         return res.send({msg: 'Invalid password or username'});
     } catch (error) {
