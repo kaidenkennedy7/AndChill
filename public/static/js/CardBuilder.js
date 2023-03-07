@@ -38,36 +38,37 @@ const CardBuilder = (() => {
             vote_avg: buildVoteAvg(item),
             release: buildRelease(item),
             genres: buildGenres(item),
-            episodesOrSeasons: buildEpisodeOrSeasons(item),
+            episodesOrSeasons: buildEpisodesOrSeasons(item),
             runtime: buildRuntime(item),
             overview: buildOverview(item)
         };
         return data;
     };
+
     const buildProviderDetails = (item) => {
         const { watch_region } = Filtering.getFilters();
         const providers = item['watch/providers'].results[watch_region];
         if (providers) {
             const { link, buy = null, rent = null, flatrate = null, ads = null, free = null } = providers;
-            let div = $(`<div class="card-provider-details"></div>`);
+            let div = $(`<div class="card-providers-details"></div>`);
             if (flatrate) {
-                let flatRateDiv = $('<div class="lists"><div class="label">Stream</div></div>');
+                let flatRateDiv = $('<div class="list"><div class="label">Stream</div></div>');
                 flatrate.forEach((value, index) => {
-                    flatRateDiv.append(`<img loading="lazy" width="30px" src="${img_url}/original/${value.logo_path}">`);
+                    flatRateDiv.append(`<img loading="lazy" width="30px" src="${img_url}original${value.logo_path}">`);
                 });
                 div.append(flatRateDiv);
             }
             if (buy) {
                 let buyDiv = $('<div class="list"><div class="label">Buy</div></div>');
                 buy.forEach((value, index) => {
-                    buyDiv.append(`<img loading="lazy" width="30px" src="${img_url}/original/${value.logo_path}">`);
+                    buyDiv.append(`<img loading="lazy" width="30px" src="${img_url}original${value.logo_path}">`);
                 });
                 div.append(buyDiv);
             }
             if (rent) {
                 let rentDiv = $('<div class="list"><div class="label">Rent</div></div>');
                 rent.forEach((value, index) => {
-                    rentDiv.append(`<img loading="lazy" width="30px" src="${img_url}/original/${value.logo_path}">`);
+                    rentDiv.append(`<img loading="lazy" width="30px" src="${img_url}original${value.logo_path}">`);
                 });
                 div.append(rentDiv);
             }
@@ -79,7 +80,7 @@ const CardBuilder = (() => {
     };
 
     const buildTitle = (item) => {
-        const title = (item.media_type === 'movie') ? item.title : item.name;
+        const title = (item.media_type == 'movie') ? item.title : item.name;
         return `<div class="card-title"><h2>${title}</h2></div>`;
     };
 
@@ -91,7 +92,7 @@ const CardBuilder = (() => {
         return `<a>${runtime}</a>`;
     };
 
-    const buildEpisodeOrSeasons = (item) => {
+    const buildEpisodesOrSeasons = (item) => {
         if (!item.number_of_episodes && !item.number_of_episodes) {
             return '';
         }
@@ -102,12 +103,12 @@ const CardBuilder = (() => {
     };
 
     const buildRelease = (item) => {
-        if (item.media_type === 'movie' && item.release_date) {
+        if (item.media_type == 'movie' && item.release_date) {
             return `<a>${item.release_date.split('-')[0]}</a>`;
         } else if (item.first_air_date) {
             let first_aired = `${item.first_air_date.split('-')[0]}`;
-            if (item.status === 'Ended') {
-                first_aired += ` - ${item.last_air_date.split('-')[0]}`;
+            if (item.status == 'Ended') { 
+                first_aired += ` - ${item.last_air_date.split('-')[0]}`; 
             } else {
                 first_aired += ' - Present';
             }
@@ -141,9 +142,9 @@ const CardBuilder = (() => {
         let trailerDiv = $(`<div class="card-trailer"></div>`);
         if (!item.videos) { return trailerDiv; }
         let trailer;
-        if (item.videos.results.length > 0){
+        if (item.videos.results.length > 0) {
             trailer = item.videos.results.find((item) => {
-                return item.site === 'YouTube' && item.type === 'Trailer';
+                return item.site == 'YouTube' && item.type == 'Trailer';
             });
             if (trailer) {
                 let trailerLink = $(`<a target="_blank" draggable="false"></a>`);
@@ -166,7 +167,7 @@ const CardBuilder = (() => {
         }
         return genresDiv;
     };
-
+    
     const buildButtons = (item) => {
         let btnDiv = $(`<div class="card-buttons"></div>`);
         const dislikebtn = $(`<div class="dislike" id="dislikeBtn">❌</div>`);
@@ -183,7 +184,7 @@ const CardBuilder = (() => {
                 const parent = $(`#${itemId}`);
                 parent.css('pointer-events', 'none');
 
-                if(ev.target.id === 'dislikeBtn') {
+                if (ev.target.id == 'dislikeBtn') {
                     parent.css('transition', 'all 1s ease');
                     parent.css('transform', 'translate3d(-2000px, 0, 0)');
                 } else {
@@ -200,9 +201,10 @@ const CardBuilder = (() => {
         return btnDiv;
     };
 
-    const getDistinctProviders = (item, watch_region) => {
+    // watch providers per country filtering should maybe be done server-side
+    const getDistrinctProviders = (item, watch_region) => {
         let watchProviders = item['watch/providers'].results[watch_region];
-        if(watchProviders){
+        if (watchProviders) {
             let list = Object.values(watchProviders);
             list.shift();
             let result = new Set();
@@ -218,15 +220,17 @@ const CardBuilder = (() => {
     const buildProviderLogos = (item) => {
         let providers = $('<div class="card-providers"></div>');
         const { watch_region } = Filtering.getFilters();
-        const logopaths = getDistinctProviders(item, watch_region);
+        const logopaths = getDistrinctProviders(item, watch_region);
         if (logopaths) {
             logopaths.forEach((value, index) => {
-                providers.append(`<img loading="lazy" src="${img_url}/original/${value}">`);
+                providers.append(`<img loading="lazy" src="${img_url}original${value}">`);
             });
         }
         return providers;
     }
-return {
+
+    return {
         buildItemCard
     }
+
 })();
