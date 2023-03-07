@@ -20,24 +20,6 @@ const fetchMovies = async (options) => {
     }
 };
 
-const getDiscoverMovies = async (options = {}) => {
-    try {
-        const discoverMovieResponse = await moviedb.discoverMovie(options);
-        return discoverMovieResponse;
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const getDiscoverTv = async (options = {}) => {
-    try {
-        const discoverTvResponse = await moviedb.discoverTv(options);
-        return discoverTvResponse;
-    } catch (error) {
-        console.error(error);
-    }
-};
-
 const fetchTv = async (options) => {
     try {
         const tvResponse = await moviedb.discoverTv(options);
@@ -113,11 +95,10 @@ const buildFilterOptions = (filter = {}) => {
 };
 
 const mixAndSortItems = async (items, sort_by) => {
-    const sort_key = sort_by.split('.')[0];
     if (sort_by.includes('.desc')) {
-        items.sort((a, b) => b[sort_key] - a[sort_key]);
+        items.sort((a, b) => b[sort_by] - a[sort_by]);
     } else {
-        items.sort((a, b) => a[sort_key] - b[sort_key]);
+        items.sort((a, b) => a[sort_by] - b[sort_by]);
     }
     return items;
 };
@@ -163,49 +144,6 @@ router.get('/', async (req, res) => {
         const tv = await fetchTv(tvOptions);
         res.send(tv);
     }
-});
-
-router.get('/discover', async (req, res) => {
-    const { filters } = req.query;
-    const parsedFilters = JSON.parse(filters);
-    if (!parsedFilters.media.movie) {
-        const response = await getDiscoverTv(parsedFilters);
-        res.send(response.results);
-    } else if (!parsedFilters.media.tv) {
-        const response = await getDiscoverMovies(parsedFilters);
-        res.send(response.results);
-    } else {
-        const movies = await getDiscoverMovies(parsedFilters);
-        const tv = await getDiscoverTv(parsedFilters);
-        const data = await mixAndSortItems([...movies.results, ...tv.results], parsedFilters.sort_by);
-        res.send(data);
-    }
-});
-
-router.get('/discover/movies', async (req, res) => {
-    const options = req.query;
-    //const response = await getDiscoverMovies(options);
-    const response = await fetchMovies(options);
-    res.send(response);
-});
-
-router.get('/discover/tv', async (req, res) => {
-    const options = req.query;
-    const response = await fetchTv(options);
-    //const response = await getDiscoverTv(options);
-    res.send(response);
-});
-
-router.get('/tv/:id', async (req, res) => {
-    const { id } = req.params;
-    const response = await moviedb.tvInfo({ id });
-    res.send(response);
-});
-
-router.get('/movie/:id', async (req, res) => {
-    const { id } = req.params;
-    const response = await moviedb.movieInfo({ id });
-    res.send(response);
 });
 
 router.get('/initial/:watch_region', async (req, res, next) => {
@@ -254,10 +192,6 @@ router.get('/ipinfo', async (req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const response = await fetch(`https://api.db-ip.com/v2/free/${ip}`);
     const ipinfo = await response.json();
-    if (ipinfo.countryCode == 'ZZ') {
-        ipinfo.countryCode = 'US';
-    }
-    console.log(ipinfo)
     res.send(ipinfo);
 });
 
