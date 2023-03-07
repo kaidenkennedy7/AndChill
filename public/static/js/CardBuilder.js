@@ -1,34 +1,31 @@
 const CardBuilder = (() => {
-    const img_url = 'https://image.tmdb.org/t/p';
+    const img_url = 'https://image.tmdb.org/t/p/';
     const tmdb_logo = 'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_1-5bdc75aaebeb75dc7ae79426ddd9be3b2be1e342510f8202baf6bffa71d7f5c4.svg';
 
     const buildItemCard = (item, swipecard = true) => {
         const itemData = buildItemData(item);
-
+        
         let card = $(`<div id="${item.id}" data-type="movie" class="card">`);
         let top = $(`<div class="card-top"></div>`);
         let middle = $(`<div class="card-info">`);
 
         top.append(itemData.trailer, itemData.providers);
-        middle.append(itemData.vote_avg, 
-            itemData.release, 
-            itemData.genres, 
-            itemData.episodesOrSeasons, 
-            itemData.runtime);
+        middle.append(itemData.vote_avg, itemData.release, itemData.genres, itemData.episodesOrSeasons, itemData.runtime);
         card.append(top);
         card.append(itemData.title);
         card.append(middle);
         card.append(itemData.overview);
         if (swipecard) {
-            itemData ['buttons'] = buildButtons(item);
-            card.append(itemData.buttons);
+            itemData['buttons'] = buildButtons(item);
+            card.append(itemData.buttons); 
         }
         if (!swipecard) {
             itemData['providerDetails'] = buildProviderDetails(item);
             card.append(itemData.providerDetails);
         }
+
         if (item.backdrop_path) {
-            card.css({'background-image': `linear-gradient(1deg, rgba(62,54,54,0.98) 31%, rgba(255,255,255,0) 80%), url('${img_url}/w780/${item.backdrop_path}')`});
+            card.css({'background-image': `linear-gradient(1deg, rgba(62,54,54,0.98) 31%, rgba(255,255,255,0) 80%), url('${img_url}w780${item.backdrop_path}')`});
         }
         return card;
     };
