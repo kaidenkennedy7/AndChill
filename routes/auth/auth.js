@@ -52,21 +52,13 @@ router.post('/auth/register', checkSchema(register), async (req, res, next) => {
         const username = req.body.username;
         const plainTextPassword = req.body.password;
         const hashedPwd = await bcrypt.hash(plainTextPassword, saltRounds);
-        const token = jwt.sign({id: username}, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN,
-        });
         const insertResult = await Credentials.create({
             email: email,
             username: username,
             password: hashedPwd
         });
-        return res.status(201).json({
-            message: 'successfully registered, redirecting to login...',
-            token,
-            data: {
-                insertResult,
-            },
-        });
+        res.status(200);
+        return res.send({});
     } catch (error) {
         res.status(500).send(`Internal server error`);
     }
