@@ -1,4 +1,5 @@
 const ItemFetch = (() => {
+
     const fetchIpData = async () => {
         const response = await fetch('/items/ipinfo');
         const ipdata = await response.json();
@@ -7,7 +8,7 @@ const ItemFetch = (() => {
 
     const fetchInitialItems = async() => {
         const { countryCode } = await fetchIpData();
-        const response = await fetch(`/items/inital/${countryCode}`);
+        const response = await fetch(`/items/initial/${ countryCode }`);
         const result = await response.json();
         return [...result];
     };
